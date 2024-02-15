@@ -1,41 +1,41 @@
-import {Player} from "../model";
-import axios, {AxiosResponse} from "axios";
+import { Player } from "../model";
+import axios, { AxiosResponse } from "axios";
 
 export type Response<T> = Promise<AxiosResponse<T>>;
 function getAxiosInstance() {
-    return axios.create({ baseURL: getServer() });
+  return axios.create({ baseURL: getServer() });
 }
 
 export function newPlayer(name: string): Response<Player> {
-    return getAxiosInstance().post(`/player`, encodeURIComponent(name));
+  return getAxiosInstance().post(`/player`, encodeURIComponent(name));
 }
 
 export function getPlayer(name: string): Response<Player> {
-    return getAxiosInstance().get(`/player/${encodeURIComponent(name)}`);
-}
-
-export function playerClick(name: string): Response<Player> {
-    return getAxiosInstance().put(`/player/${encodeURIComponent(name)}`);
+  return getAxiosInstance().get(`/player/${encodeURIComponent(name)}`);
 }
 
 export function getLeaderboard(): Response<Player[]> {
-    return getAxiosInstance().get("/player/leaderboard");
+  return getAxiosInstance().get("/player/leaderboard");
 }
 
 export function getCurrentPlayer(): string | null {
-    return window.localStorage.getItem("player");
+  return window.localStorage.getItem("player");
 }
 
 export function setCurrentPlayer(player: string | null): void {
-    if (!player) return window.localStorage.removeItem("player");
-    window.localStorage.setItem("player", player);
+  if (!player) return window.localStorage.removeItem("player");
+  window.localStorage.setItem("player", player);
 }
 
 export function getServer(): string {
-    return window.localStorage.getItem("server") || import.meta.env.VITE_SERVER;
+  return window.localStorage.getItem("server") || import.meta.env.VITE_SERVER;
 }
 
 export function setServer(server: string | null): void {
-    if (!server) return window.localStorage.removeItem("server");
-    window.localStorage.setItem("server", server);
+  if (!server) return window.localStorage.removeItem("server");
+  window.localStorage.setItem("server", server);
+}
+
+export function getCurLand(): string | null {
+  return window.localStorage.getItem("land") || import.meta.env.VITE_SERVER;
 }

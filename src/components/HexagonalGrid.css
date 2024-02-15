@@ -1,0 +1,35 @@
+/* x is column */
+
+.hex-grid {
+  display: grid;
+  grid-template-columns: repeat(cols, 1fr);
+  grid-gap: 1px;
+  position: relative;
+  padding-top: 40px; /* Adjust the padding as needed to create space from window edge */
+  margin: 40px; /* Adjust the margin as needed to create space around the grid */
+}
+
+.hex {
+  width: 100px; /* Adjust tzzxzxhe size as needed */
+  height: 115px; /* Adjust the size as needed */
+  background-image: url("../assets/Polygon.jpg"); /* Update the image path */
+  background-size: contain;
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+  transform: rotate(90deg);
+  position: relative;
+}
+
+/* Styling for coordinates */
+.hex::before {
+  content: attr(data-row) "," attr(data-column);
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(-90deg);
+  color: white;
+  font-size: 18px;
+}
+
+.hex.even-column {
+  transform: rotate(90deg) translateX(-58px); /* Adjust the translateX value as needed */
+}
