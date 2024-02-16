@@ -7,11 +7,24 @@ import nstart from "../assets/start2.png";
 import sett from "../assets/setting.png";
 import nsett from "../assets/setting2.png";
 import startsfx from "../assets/enter.mp3";
+import { AxiosResponse } from "axios";
+import { useNavigate } from "react-router-dom";
+import { ApiResponse } from "../model";
+import { newLand, setCurLand } from "../repositories";
 
 function Menu() {
   const [startImage, setStartImage] = useState(start);
   const [settImage, setSettImage] = useState(sett);
   const [popped, pop] = React.useState(false);
+  const [landed, setland] = React.useState(false);
+
+  useEffect(() => {
+    newLand().then(handleSuccess);
+  }, [landed]);
+
+  function handleSuccess(response: AxiosResponse<ApiResponse>) {
+    setCurLand(response.data.players);
+  }
 
   useEffect(() => {
     if (!popped) return;
@@ -27,6 +40,7 @@ function Menu() {
   const handleMouseOut = () => {
     setStartImage(start);
     pop(false);
+    setland(true);
   };
 
   const handleSettClick = () => {

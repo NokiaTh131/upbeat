@@ -1,9 +1,14 @@
 import { Player } from "../model";
 import axios, { AxiosResponse } from "axios";
+import { ApiResponse } from "../model";
 
 export type Response<T> = Promise<AxiosResponse<T>>;
 function getAxiosInstance() {
   return axios.create({ baseURL: getServer() });
+}
+
+export function newLand(): Response<ApiResponse> {
+  return getAxiosInstance().post(`/land`);
 }
 
 export function newPlayer(name: string): Response<Player> {
@@ -12,6 +17,10 @@ export function newPlayer(name: string): Response<Player> {
 
 export function getPlayer(name: string): Response<Player> {
   return getAxiosInstance().get(`/player/${encodeURIComponent(name)}`);
+}
+
+export function getLand(): Response<ApiResponse> {
+  return getAxiosInstance().get(`/land`);
 }
 
 export function getLeaderboard(): Response<Player[]> {
@@ -37,5 +46,44 @@ export function setServer(server: string | null): void {
 }
 
 export function getCurLand(): string | null {
-  return window.localStorage.getItem("land") || import.meta.env.VITE_SERVER;
+  return window.localStorage.getItem("land");
+}
+
+export function setCurLand(land: Player[] | null): void {
+  if (!land) return window.localStorage.removeItem("land");
+  window.localStorage.setItem("land", "i am land");
+}
+
+export function setConstructionPlan(
+  name: string,
+  constructionplan: string
+): Response<Player> {
+  return getAxiosInstance().put(
+    `/player/${encodeURIComponent(name)}/constructionplan`,
+    constructionplan, // Send the string directly without double quotes
+    {
+      headers: {
+        "Content-Type": "text/plain", // Set the content type to plain text
+      },
+    }
+  );
+}
+
+export function setCurConstructionPlan(
+  name: string,
+  constructionPlan: string
+): void {
+  if (!constructionPlan) {
+    window.localStorage.removeItem(`constructionPlan_${name}`);
+  } else {
+    window.localStorage.setItem(`constructionPlan_${name}`, constructionPlan);
+  }
+}
+
+export function getCurConstructionPlan(name: string): string | null {
+  return window.localStorage.getItem(`constructionPlan_${name}`);
+}
+
+export function Parse(name: string): void {
+  getAxiosInstance().post(`/player/${encodeURIComponent(name)}/parse`);
 }

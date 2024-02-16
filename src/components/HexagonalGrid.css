@@ -1,12 +1,17 @@
 /* x is column */
 
+/* Additional styling for content inside the body, if needed */
+.container {
+  text-align: center;
+}
+
 .hex-grid {
   display: grid;
   grid-template-columns: repeat(cols, 1fr);
   grid-gap: 1px;
   position: relative;
   padding-top: 40px; /* Adjust the padding as needed to create space from window edge */
-  margin: 40px; /* Adjust the margin as needed to create space around the grid */
+  margin: 50px; /* Adjust the margin as needed to create space around the grid */
 }
 
 .hex {
@@ -17,8 +22,40 @@
   clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
   transform: rotate(90deg);
   position: relative;
+  filter: brightness(1);
+  transition: filter 0.3s ease-in-out;
 }
 
+.hex:hover {
+  filter: brightness(3); /* Adjust the brightness value as needed */
+}
+
+.house-image {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(-90deg);
+  width: 150%;
+  height: auto;
+}
+
+.castle-image {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(-90deg);
+  width: 80%;
+  height: auto;
+}
+
+.castle-forshow {
+  position: absolute;
+  top: 50%;
+  left: -10%;
+  transform: translate(-50%, -50%);
+  width: 30%;
+  height: auto;
+}
 /* Styling for coordinates */
 .hex::before {
   content: attr(data-row) "," attr(data-column);
@@ -32,4 +69,34 @@
 
 .hex.even-column {
   transform: rotate(90deg) translateX(-58px); /* Adjust the translateX value as needed */
+}
+
+.hello-text {
+  position: fixed;
+  top: 10px;
+  right: 20px;
+  padding: 20px;
+  color: #fff;
+  z-index: 9999; /* Set a high z-index value to ensure it's on top */
+  font-size: 25px;
+  font-family: "Press Start 2P", cursive;
+}
+
+.text-editor-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.text-editor {
+  background: linear-gradient(to left, #15152e, #0000);
+  padding: 20px;
+  border-radius: 8px;
+  font-size: 16px;
 }
