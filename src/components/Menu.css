@@ -1,16 +1,18 @@
 .menu {
-  position: absolute;
+  position: fixed;
   display: flex;
   align-items: center;
   flex-direction: column;
-  justify-content: center; /* Center horizontally */
-  top: 55%; /* Center vertically */
+  justify-content: center;
   transform: translateY(-50%);
-  right: 43%;
+  top: 550px;
+  right: 810px;
+  padding: 20px;
+  z-index: 9999;
 }
 
 .menu a {
-  padding: 20px;
+  padding: 10px;
   text-decoration: none;
   color: #ffffff;
 }

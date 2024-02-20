@@ -1,6 +1,3 @@
-/* x is column */
-
-/* Additional styling for content inside the body, if needed */
 .container {
   text-align: center;
 }
@@ -10,24 +7,25 @@
   grid-template-columns: repeat(cols, 1fr);
   grid-gap: 1px;
   position: relative;
-  padding-top: 40px; /* Adjust the padding as needed to create space from window edge */
-  margin: 50px; /* Adjust the margin as needed to create space around the grid */
+  padding-top: 40px;
+  margin: 50px;
+  transition: transform 0.6s ease;
 }
 
 .hex {
-  width: 100px; /* Adjust tzzxzxhe size as needed */
-  height: 115px; /* Adjust the size as needed */
-  background-image: url("../assets/Polygon.jpg"); /* Update the image path */
+  width: 100px;
+  height: 115px;
+  background-image: url("../assets/Polygon.jpg");
   background-size: contain;
   clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
   transform: rotate(90deg);
   position: relative;
-  filter: brightness(1);
-  transition: filter 0.3s ease-in-out;
+  transition: filter 0.2s ease-in-out;
 }
 
 .hex:hover {
-  filter: brightness(3); /* Adjust the brightness value as needed */
+  filter: brightness(2);
+  cursor: pointer;
 }
 
 .house-image {
@@ -63,7 +61,7 @@
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%) rotate(-90deg);
-  color: white;
+  color: rgb(255, 255, 255);
   font-size: 18px;
 }
 
@@ -78,7 +76,18 @@
   padding: 20px;
   color: #fff;
   z-index: 9999; /* Set a high z-index value to ensure it's on top */
-  font-size: 25px;
+  font-size: 20px;
+  font-family: "Press Start 2P", cursive;
+}
+
+.time-text {
+  position: fixed;
+  top: 10px;
+  left: 20px;
+  padding: 20px;
+  color: #fff;
+  z-index: 9999; /* Set a high z-index value to ensure it's on top */
+  font-size: 20px;
   font-family: "Press Start 2P", cursive;
 }
 
@@ -88,15 +97,23 @@
   left: 0;
   width: 100vw;
   height: 100vh;
-  background-color: rgba(0, 0, 0, 0.7);
+
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
 .text-editor {
-  background: linear-gradient(to left, #15152e, #0000);
+  background: linear-gradient(to bottom, #15152e, #000000);
   padding: 20px;
   border-radius: 8px;
   font-size: 16px;
+}
+
+.centered-container {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 999; /* Adjust the z-index to ensure it appears on top */
 }

@@ -47,8 +47,12 @@ export type Map = {
   row: number;
   col: number;
 };
-
+//this is land but i too lazy to change it.
 export type ApiResponse = {
   map: Map;
   players: Player[];
+  plan_rev_min: number;
+  plan_rev_sec: number;
+  init_plan_min: number;
+  init_plan_sec: number;
 };
