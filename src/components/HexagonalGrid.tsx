@@ -118,14 +118,10 @@ function HexagonalGrid() {
         Parse(player.name);
         sendMessage("refreshMap", player.name);
         alert("Construction plan saved successfully");
+        setShowTextEditor(false);
       })
       .catch((error) => {
-        alert("error saving construction plan");
-        handleSaveConstructionPlan();
-      })
-      .finally(() => {
-        // Close the text editor
-        setShowTextEditor(false);
+        alert(error + " Please press save again.");
       });
   };
 
