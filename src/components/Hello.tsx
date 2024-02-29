@@ -30,9 +30,6 @@ function Hello() {
     newPlayer(name).then(handleSuccess).catch(handleError);
   }
 
-  // useEffect(() => {
-  //   newPlayer(askForName()).then(handleSuccess).catch(handleError);
-  // }, []);
   return (
     <>
       <div className="w-full max-w-xs">

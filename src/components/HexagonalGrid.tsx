@@ -78,19 +78,23 @@ function HexagonalGrid() {
   }, []);
 
   React.useEffect(() => {
-    const name = username;
-    if (!name) return navigate("/");
-    getPlayer(name)
-      .then((response) => {
-        setPlayer(response.data);
-      })
-      .catch(setError);
+    webSocketState.messages?.map((message) => {
+      if (message.content === "refreshMap") {
+        const name = username;
+        if (!name) return navigate("/");
+        getPlayer(name)
+          .then((response) => {
+            setPlayer(response.data);
+          })
+          .catch(setError);
 
-    const landd = getCurLand();
-    if (!landd) return navigate("/");
-    getLand()
-      .then((response) => setLand(response.data))
-      .catch(setError);
+        const landd = getCurLand();
+        if (!landd) return navigate("/");
+        getLand()
+          .then((response) => setLand(response.data))
+          .catch(setError);
+      }
+    });
   }, [[webSocketState.messages]]);
 
   const [countdown, setCountdown] = useState(10);

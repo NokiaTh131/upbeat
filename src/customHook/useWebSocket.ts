@@ -44,13 +44,9 @@ function useWebSocket() {
     }
   }
 
-  function updateMap() {
-    if (webSocket.stompClient && webSocket.stompClient.connected) {
-      webSocket.stompClient.send("/app/map.sendUpdate");
-    }
-  }
   const onConnected = (stompClient: Stomp.Client, username: string) => {
     stompClient.subscribe("/topic/menupublic", onMessageReceived);
+    stompClient.subscribe("/topic/mainmenupublic", onMessageReceived);
     stompClient.send(
       "/app/menu.addUser",
       {},
@@ -66,7 +62,7 @@ function useWebSocket() {
   const onMessageReceived = (payload: Stomp.Message) => {
     dispatch(appendMessage(JSON.parse(payload.body)));
   };
-  return { connect, sendMessage, updateMap };
+  return { connect, sendMessage };
 }
 
 export default useWebSocket;

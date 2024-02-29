@@ -11,16 +11,28 @@ import { AxiosResponse } from "axios";
 import { useNavigate } from "react-router-dom";
 import { ApiResponse } from "../model";
 import { newLand, setCurLand } from "../repositories";
+import useWebSocket from "../customHook/useWebSocket.ts";
+import { useAppSelector } from "../customHook/store/hooks.ts";
+import { selectWebSocket } from "../customHook/store/Slices/webSocketSlice.ts";
 
 function Menu() {
   const [startImage, setStartImage] = useState(start);
   const [settImage, setSettImage] = useState(sett);
   const [popped, pop] = React.useState(false);
   const [landed, setland] = React.useState(false);
+  const { sendMessage } = useWebSocket();
+  const navigate = useNavigate();
+  const webSocketState = useAppSelector(selectWebSocket);
 
   useEffect(() => {
     newLand().then(handleSuccess);
   }, [landed]);
+
+  useEffect(() => {
+    webSocketState.messages?.map((message) => {
+      if (message.content === "Start") navigate("/map");
+    });
+  }, [[webSocketState.messages]]);
 
   function handleSuccess(response: AxiosResponse<ApiResponse>) {
     setCurLand(response.data.players);
@@ -35,6 +47,7 @@ function Menu() {
   const handleMouseIn = () => {
     setStartImage(nstart);
     pop(true);
+    sendMessage("Start", "Start");
   };
 
   const handleMouseOut = () => {
