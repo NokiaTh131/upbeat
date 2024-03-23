@@ -11,6 +11,7 @@ import {
   getCurConstructionPlan,
   setCurConstructionPlan,
   Parse,
+  playerReady,
 } from "../repositories";
 import { useNavigate } from "react-router-dom";
 import home from "../assets/home.png";
@@ -39,8 +40,16 @@ function HexagonalGrid() {
   const { sendMessage } = useWebSocket();
   const username = useAppSelector(selectUsername);
   const webSocketState = useAppSelector(selectWebSocket);
+  const [timeout, setTimeout] = useState(false);
+  const [disBut, setDisbut] = useState(false);
+  const [disTextBut, setTextDisbut] = useState(true);
 
+  const [isLoading, setLoading] = useState(false);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    setShowTextEditor(true);
+  }, []);
 
   useEffect(() => {
     return () => {
@@ -97,7 +106,17 @@ function HexagonalGrid() {
     });
   }, [[webSocketState.messages]]);
 
-  const [countdown, setCountdown] = useState(10);
+  React.useEffect(() => {
+    webSocketState.messages?.map((message) => {
+      if (message.content === username) {
+        setTextDisbut(false);
+      } else {
+        setTextDisbut(true);
+      }
+    });
+  }, [[webSocketState.messages]]);
+
+  const [countdown, setCountdown] = useState(0);
 
   useEffect(() => {
     const handleKeyDown = (event) => {
@@ -116,6 +135,8 @@ function HexagonalGrid() {
   }, []);
 
   const handleSaveConstructionPlan = () => {
+    setDisbut(true);
+    setLoading(true);
     setConstructionPlan(player.name, constructionPlanText)
       .then((response) => {
         setCurConstructionPlan(player.name, constructionPlanText);
@@ -123,9 +144,14 @@ function HexagonalGrid() {
         sendMessage("refreshMap", player.name);
         alert("Construction plan saved successfully");
         setShowTextEditor(false);
+        setDisbut(false);
+        setLoading(false);
+        playerReady();
       })
       .catch((error) => {
         alert(error + " Please press save again.");
+        setDisbut(false);
+        setLoading(false);
       });
   };
 
@@ -134,31 +160,39 @@ function HexagonalGrid() {
   }
 
   const { rows, cols } = player.bindings;
-  const { plan_rev_min, plan_rev_sec } = landed;
   const graph = landed?.map.adjacencyMatrix;
+  const { plan_rev_min, plan_rev_sec } = landed;
 
   const handleOpenTextEditor = () => {
-    setCountdown(plan_rev_min * 60 + plan_rev_sec);
-    setShowTextEditor(true);
-    if (editTimer) {
-      clearInterval(editTimer);
+    if (timeout) {
+      handleSaveConstructionPlan();
+      return;
     }
-    const timer = setInterval(() => {
-      setCountdown((prevCountdown) => {
-        if (prevCountdown > 0) {
-          return prevCountdown - 1;
-        } else {
-          // Clear the interval when countdown reaches 0
-          setShowTextEditor(false);
-          clearInterval(timer);
-          handleSaveConstructionPlan();
-          return 0;
-        }
-      });
-    }, 1000);
+    if (!showTextEditor) {
+      const remainingTime = countdown || plan_rev_min * 60 + plan_rev_sec;
+      setCountdown(remainingTime);
+      setShowTextEditor(true);
+      if (editTimer) {
+        clearInterval(editTimer);
+      }
+      const timer = setInterval(() => {
+        setCountdown((prevCountdown) => {
+          if (prevCountdown > 0) {
+            return prevCountdown - 1;
+          } else {
+            // Clear the interval when countdown reaches 0
+            setShowTextEditor(false);
+            clearInterval(timer);
+            handleSaveConstructionPlan();
+            setTimeout(true);
+            return 0;
+          }
+        });
+      }, 1000);
 
-    // Save the timer reference to state
-    setEditTimer(timer);
+      // Save the timer reference to state
+      setEditTimer(timer);
+    }
   };
 
   const formatTime = (timeInSeconds) => {
@@ -228,7 +262,7 @@ function HexagonalGrid() {
 
   return (
     <div>
-      {/* <ChatBox /> */}
+      <ChatBox />
       {showTextEditor && (
         <div className="time-text">
           {`Time remaining: ${formatTime(countdown)}`}
@@ -255,16 +289,20 @@ function HexagonalGrid() {
         <div className="text-editor-overlay">
           <div className="text-editor">
             <textarea
+              className="text-edit-con"
               value={constructionPlanText}
               onChange={(e) => setConstructionPlanText(e.target.value)}
             />
-            <button onClick={handleSaveConstructionPlan}>
+            <button
+              onClick={handleSaveConstructionPlan}
+              disabled={disBut ? true : false}
+            >
               Save Construction Plan
             </button>
           </div>
         </div>
       )}
-
+      {isLoading && <div className="loader"></div>}
       {showNotification && (
         <div className="notification-modal">
           <div className="notification-content">
@@ -273,7 +311,12 @@ function HexagonalGrid() {
           </div>
         </div>
       )}
-      <button onClick={handleOpenTextEditor}>Open Text Editor</button>
+      <button
+        onClick={handleOpenTextEditor}
+        disabled={disTextBut ? true : false}
+      >
+        Open Text Editor
+      </button>
     </div>
   );
 }

@@ -33,15 +33,12 @@ export default function ChatBox() {
                 sender={message.sender}
                 messageType={message.type}
                 key={index}
-                timestamp={message.timestamp}
               />
             ) : (
               <Chat
                 key={index}
                 content={message.content}
-                sender={message.sender}
                 isMe={username === message.sender}
-                timestamp={message.timestamp}
               />
             );
           })}

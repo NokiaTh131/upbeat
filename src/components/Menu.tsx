@@ -10,7 +10,7 @@ import startsfx from "../assets/enter.mp3";
 import { AxiosResponse } from "axios";
 import { useNavigate } from "react-router-dom";
 import { ApiResponse } from "../model";
-import { newLand, setCurLand } from "../repositories";
+import { newLand, setCurLand, StartGame } from "../repositories";
 import useWebSocket from "../customHook/useWebSocket.ts";
 import { useAppSelector } from "../customHook/store/hooks.ts";
 import { selectWebSocket } from "../customHook/store/Slices/webSocketSlice.ts";
@@ -48,6 +48,7 @@ function Menu() {
     setStartImage(nstart);
     pop(true);
     sendMessage("Start", "Start");
+    StartGame();
   };
 
   const handleMouseOut = () => {

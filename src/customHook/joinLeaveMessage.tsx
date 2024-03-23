@@ -2,7 +2,6 @@ import { messageType } from "../customHook/store/Slices/webSocketSlice.ts";
 
 interface JoinLeaveMessageProps {
   sender: string;
-  timestamp: string;
   messageType: messageType;
 }
 export default function JoinLeaveMessage(Props: JoinLeaveMessageProps) {
@@ -14,7 +13,6 @@ export default function JoinLeaveMessage(Props: JoinLeaveMessageProps) {
             <span className="font-bold">{Props.sender}</span>
             <span> has joined the chat!</span>
             <br />
-            {Props.timestamp}
           </div>
         </div>
       ) : (

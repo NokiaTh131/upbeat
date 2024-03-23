@@ -87,3 +87,11 @@ export function getCurConstructionPlan(name: string): string | null {
 export function Parse(name: string): void {
   getAxiosInstance().post(`/player/${encodeURIComponent(name)}/parse`);
 }
+
+export function StartGame(): void {
+  getAxiosInstance().post("/newGame");
+}
+
+export function playerReady(): void {
+  getAxiosInstance().put("/newGame");
+}
