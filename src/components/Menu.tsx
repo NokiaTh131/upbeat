@@ -4,8 +4,6 @@ import { Link } from "react-router-dom";
 import "./Menu.css";
 import start from "../assets/start.png";
 import nstart from "../assets/start2.png";
-import sett from "../assets/setting.png";
-import nsett from "../assets/setting2.png";
 import startsfx from "../assets/enter.mp3";
 import { AxiosResponse } from "axios";
 import { useNavigate } from "react-router-dom";
@@ -17,12 +15,12 @@ import { selectWebSocket } from "../customHook/store/Slices/webSocketSlice.ts";
 
 function Menu() {
   const [startImage, setStartImage] = useState(start);
-  const [settImage, setSettImage] = useState(sett);
   const [popped, pop] = React.useState(false);
   const [landed, setland] = React.useState(false);
   const { sendMessage } = useWebSocket();
   const navigate = useNavigate();
   const webSocketState = useAppSelector(selectWebSocket);
+  const [startHighlighted, setStartHighlighted] = useState(false);
 
   useEffect(() => {
     newLand().then(handleSuccess);
@@ -57,18 +55,16 @@ function Menu() {
     setland(true);
   };
 
-  const handleSettClick = () => {
-    setSettImage(nsett);
-    pop(true);
-  };
-
-  const handleSettRelease = () => {
-    setSettImage(sett);
-    pop(false);
-  };
-
   return (
-    <div className="menu">
+    <div
+      className="menu"
+      style={{
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        height: "100vh",
+      }}
+    >
       <Link
         to="/map"
         onMouseDown={handleMouseIn}
@@ -78,21 +74,11 @@ function Menu() {
         <img
           src={startImage}
           alt="Start"
+          onMouseEnter={() => setStartHighlighted(true)}
+          onMouseLeave={() => setStartHighlighted(false)}
+          className={startHighlighted ? "highlighted" : ""}
           onClick={handleMouseIn}
           onMouseUp={handleMouseOut}
-        />
-      </Link>
-      <Link
-        to="/leaderboard"
-        onMouseDown={handleSettClick}
-        onMouseUp={handleSettRelease}
-        onMouseLeave={handleSettRelease}
-      >
-        <img
-          src={settImage}
-          alt="Settings"
-          onClick={handleSettClick}
-          onMouseUp={handleSettRelease}
         />
       </Link>
     </div>

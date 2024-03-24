@@ -11,7 +11,7 @@ export default function JoinLeaveMessage(Props: JoinLeaveMessageProps) {
         <div className="flex items-center justify-center mb-2">
           <div className="bg-blue-300 p-3 rounded-lg w-full text-center max-w-full">
             <span className="font-bold">{Props.sender}</span>
-            <span> has joined the chat!</span>
+            <span> has joined the game!</span>
             <br />
           </div>
         </div>
@@ -19,7 +19,7 @@ export default function JoinLeaveMessage(Props: JoinLeaveMessageProps) {
         <div className="flex items-center justify-center mb-2">
           <div className="bg-red-300 p-3 rounded-lg w-full text-center max-w-full">
             <span className="font-bold">{Props.sender}</span>
-            <span> has left the chat</span>
+            <span> has left the game</span>
           </div>
         </div>
       )}

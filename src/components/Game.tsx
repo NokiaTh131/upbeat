@@ -2,12 +2,12 @@ import Bg from "../assets/main.png";
 import Title from "../assets/title.png";
 import Earth from "../assets/earth.png";
 import Mainbgm from "../assets/Mbgm.mp3";
+import sett from "../assets/setting.png";
+import nsett from "../assets/setting2.png";
 
-import React, { useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import "./Game.css";
-// import { getCurrentPlayer, playerClick } from "../repositories";
-// import { useNavigate } from "react-router-dom";
-// import { Alert } from "@mui/material";
+import "./Menu.css";
 import Menu from "./Menu.tsx";
 import { useAppSelector } from "../customHook/store/hooks.ts";
 import { selectUsername } from "../customHook/store/Slices/usernameSlice.ts";
@@ -16,19 +16,25 @@ import {
   messageType,
 } from "../customHook/store/Slices/webSocketSlice.ts";
 import useWebSocket from "../customHook/useWebSocket.ts";
-
+import "./NotificationModal.css";
 import JoinLeaveMessage from "../customHook/joinLeaveMessage.tsx";
+import { Link } from "react-router-dom";
 
 function Game() {
+  const [volume, setVolume] = useState(0.02);
+  const [showNotification, setShowNotification] = useState(false);
   const popped = false;
   const username = useAppSelector(selectUsername);
   const webSocketState = useAppSelector(selectWebSocket);
   const { connect } = useWebSocket();
   console.log("WebSocket Connected:", connect);
+  const [settImage, setSettImage] = useState(sett);
+  const [poppeded, pop] = React.useState(false);
+  const [settHighlighted, setSettHighlighted] = useState(false);
 
   useEffect(() => {
     const audio = new Audio(Mainbgm);
-    audio.volume = 0.02;
+    audio.volume = volume;
 
     if (!popped) {
       audio.play();
@@ -42,7 +48,23 @@ function Game() {
       audio.pause();
       audio.currentTime = 0;
     };
-  }, [popped]);
+  }, [popped, volume]);
+
+  const handleVolumeChange = (event) => {
+    const newVolume = parseFloat(event.target.value);
+    setVolume(newVolume);
+  };
+
+  const handleSettClick = () => {
+    setSettImage(nsett);
+    pop(true);
+  };
+
+  const handleSettRelease = () => {
+    setShowNotification(true);
+    setSettImage(sett);
+    pop(false);
+  };
 
   return (
     <div className="game">
@@ -54,12 +76,70 @@ function Game() {
         />
         <div
           style={{
+            position: "absolute",
+            top: "29%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            zIndex: 9500, // Set a high z-index to ensure it appears on top
+          }}
+        >
+          <div>
+            <img
+              src={settImage}
+              alt="Settings"
+              onMouseEnter={() => setSettHighlighted(true)}
+              onMouseLeave={() => {
+                setSettHighlighted(false);
+                handleSettRelease();
+              }}
+              className={settHighlighted ? "highlighted" : ""}
+              onClick={handleSettClick}
+              onMouseUp={handleSettRelease}
+            />
+          </div>
+        </div>
+        <div
+          style={{
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
             height: "100vh",
           }}
         >
+          {showNotification && (
+            <div className="notification-modal">
+              <div className="notification-content">
+                <div
+                  style={{
+                    position: "absolute",
+                    bottom: "50%",
+                    left: "50%",
+                    transform: "translate(-50%, 50%)",
+                  }}
+                >
+                  <input
+                    type="range"
+                    min="0"
+                    max="1"
+                    step="0.01"
+                    value={volume}
+                    onChange={handleVolumeChange}
+                    style={{ width: "200px" }} // Adjust the width as needed
+                  />
+                </div>
+                <p>Volume mixer</p>
+                <button
+                  onClick={() => {
+                    setShowNotification(false);
+                  }}
+                  style={{ marginTop: "50px" }}
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          )}
+
           <img
             src={Title}
             alt="Title"
@@ -90,7 +170,7 @@ function Game() {
             alt="Earth"
             style={{
               position: "absolute",
-              top: "38%", // Adjust the top value as needed
+              bottom: "30%", // Adjust the top value as needed
               transform: "translate(-50%, -50%)",
               width: "700px", // Adjust the size as needed
               height: "auto",

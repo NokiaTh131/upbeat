@@ -84,8 +84,18 @@ export function getCurConstructionPlan(name: string): string | null {
   return window.localStorage.getItem(`constructionPlan_${name}`);
 }
 
-export function Parse(name: string): void {
-  getAxiosInstance().post(`/player/${encodeURIComponent(name)}/parse`);
+export function Parse(name: string): Promise<void> {
+  return new Promise((resolve, reject) => {
+    getAxiosInstance()
+      .post(`/player/${encodeURIComponent(name)}/parse`)
+      .then((response) => {
+        // Optionally, you can handle response data here if needed
+        resolve(); // Resolve the promise since request is successful
+      })
+      .catch((error) => {
+        reject(error); // Reject the promise if there's an error
+      });
+  });
 }
 
 export function StartGame(): void {

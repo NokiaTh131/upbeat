@@ -37,15 +37,48 @@ function HexagonalGrid() {
   const [editTimer, setEditTimer] = useState(null);
   const [notificationMessage, setNotificationMessage] = useState("");
   const [showNotification, setShowNotification] = useState(false);
+  const [isInfo, setIsinfo] = useState(false);
   const { sendMessage } = useWebSocket();
   const username = useAppSelector(selectUsername);
   const webSocketState = useAppSelector(selectWebSocket);
   const [timeout, setTimeout] = useState(false);
   const [disBut, setDisbut] = useState(false);
+  const [disyesBut, setyesDisbut] = useState(false);
   const [disTextBut, setTextDisbut] = useState(true);
-
   const [isLoading, setLoading] = useState(false);
+  const [websocketMessage, setWebsocketMessage] = useState("");
+  const [showChatBox, setShowChatBox] = useState(false);
+  const [showCountdown, setShowCountdown] = useState(false); // State to control visibility of countdown
+
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (showNotification) {
+      // Start countdown if isInfo is true
+      setCountdown2(init_plan_min * 60 + init_plan_sec);
+      setShowCountdown(true);
+      const interval = setInterval(() => {
+        setCountdown2((prevCountdown) => {
+          if (prevCountdown > 0) {
+            return prevCountdown - 1;
+          } else {
+            setyesDisbut(true);
+            clearInterval(interval);
+            setShowCountdown(false);
+            return 0;
+          }
+        });
+      }, 1000);
+      // Clear the interval on component unmount
+      return () => clearInterval(interval);
+    }
+  }, [showNotification]);
+
+  useEffect(() => {
+    if (!disTextBut) {
+      setShowNotification(true);
+    }
+  }, [disTextBut]);
 
   useEffect(() => {
     setShowTextEditor(true);
@@ -88,35 +121,39 @@ function HexagonalGrid() {
 
   React.useEffect(() => {
     webSocketState.messages?.map((message) => {
-      if (message.content === "refreshMap") {
-        const name = username;
-        if (!name) return navigate("/");
-        getPlayer(name)
-          .then((response) => {
-            setPlayer(response.data);
-          })
-          .catch(setError);
+      const name = username;
+      if (!name) return navigate("/");
+      getPlayer(name)
+        .then((response) => {
+          setPlayer(response.data);
+        })
+        .catch(setError);
 
-        const landd = getCurLand();
-        if (!landd) return navigate("/");
-        getLand()
-          .then((response) => setLand(response.data))
-          .catch(setError);
-      }
+      const landd = getCurLand();
+      if (!landd) return navigate("/");
+      getLand()
+        .then((response) => setLand(response.data))
+        .catch(setError);
     });
   }, [[webSocketState.messages]]);
 
   React.useEffect(() => {
     webSocketState.messages?.map((message) => {
-      if (message.content === username) {
+      const name = username;
+      if (!name) return navigate("/");
+      if (message.content === name) {
         setTextDisbut(false);
       } else {
         setTextDisbut(true);
+      }
+      if (message.sender === "GM") {
+        setWebsocketMessage(message.content);
       }
     });
   }, [[webSocketState.messages]]);
 
   const [countdown, setCountdown] = useState(0);
+  const [countdown2, setCountdown2] = useState(0);
 
   useEffect(() => {
     const handleKeyDown = (event) => {
@@ -134,25 +171,26 @@ function HexagonalGrid() {
     };
   }, []);
 
-  const handleSaveConstructionPlan = () => {
+  const handleSaveConstructionPlan = async () => {
     setDisbut(true);
     setLoading(true);
-    setConstructionPlan(player.name, constructionPlanText)
-      .then((response) => {
-        setCurConstructionPlan(player.name, constructionPlanText);
-        Parse(player.name);
-        sendMessage("refreshMap", player.name);
-        alert("Construction plan saved successfully");
-        setShowTextEditor(false);
-        setDisbut(false);
-        setLoading(false);
-        playerReady();
-      })
-      .catch((error) => {
-        alert(error + " Please press save again.");
-        setDisbut(false);
-        setLoading(false);
-      });
+
+    try {
+      await setConstructionPlan(username, constructionPlanText);
+      await setCurConstructionPlan(username, constructionPlanText);
+      await Parse(username);
+
+      alert(username + " do parse");
+      setShowTextEditor(false);
+      setDisbut(false);
+      setLoading(false);
+      playerReady();
+      setShowNotification(false);
+    } catch (error) {
+      alert(error + " Please press save again.");
+      setDisbut(false);
+      setLoading(false);
+    }
   };
 
   if (!player || !player.bindings || !landed) {
@@ -161,7 +199,11 @@ function HexagonalGrid() {
 
   const { rows, cols } = player.bindings;
   const graph = landed?.map.adjacencyMatrix;
-  const { plan_rev_min, plan_rev_sec } = landed;
+  const { plan_rev_min, plan_rev_sec, init_plan_min, init_plan_sec } = landed;
+
+  const handleDebugButtonClick = () => {
+    setShowChatBox(!showChatBox);
+  };
 
   const handleOpenTextEditor = () => {
     if (timeout) {
@@ -212,17 +254,7 @@ function HexagonalGrid() {
       setNotificationMessage(
         `Deposit of ${playerID}: ${Number(Math.abs(deposit)).toFixed(2)}`
       );
-      setShowNotification(true);
-    };
-
-    const handleMouseOver = (event) => {
-      // Add your glow effect logic here
-      event.target.classList.add("glow");
-    };
-
-    const handleMouseLeave = (event) => {
-      // Remove highlighting and glow logic here
-      event.target.classList.remove("highlighted", "glow");
+      setIsinfo(true);
     };
 
     for (let row = 1; row <= rows; row++) {
@@ -241,8 +273,6 @@ function HexagonalGrid() {
             data-row={row}
             data-column={column}
             onClick={(event) => handleClick(event, p.name, deposit)}
-            onMouseOver={handleMouseOver}
-            onMouseLeave={handleMouseLeave}
           >
             {player_Id !== 0 && (
               <img
@@ -262,7 +292,19 @@ function HexagonalGrid() {
 
   return (
     <div>
-      <ChatBox />
+      {showCountdown && (
+        <div className="countdown-container">
+          <p className="countdown-text">{`Time remaining: ${formatTime(
+            countdown2
+          )}`}</p>
+        </div>
+      )}
+      {showChatBox && <ChatBox />}
+      {websocketMessage && (
+        <div className="websocket-message-container">
+          <div className="websocket-message">{websocketMessage}</div>
+        </div>
+      )}
       {showTextEditor && (
         <div className="time-text">
           {`Time remaining: ${formatTime(countdown)}`}
@@ -302,20 +344,47 @@ function HexagonalGrid() {
           </div>
         </div>
       )}
-      {isLoading && <div className="loader"></div>}
+      {<div className="loader"></div>}
       {showNotification && (
         <div className="notification-modal">
           <div className="notification-content">
-            <p>{notificationMessage}</p>
-            <button onClick={() => setShowNotification(false)}>Close</button>
+            <p>do you want to change plan?</p>
+            <button
+              onClick={() => {
+                setShowNotification(false);
+                handleOpenTextEditor();
+              }}
+              disabled={disyesBut ? true : false}
+            >
+              Yes
+            </button>
+            <button
+              onClick={() => {
+                handleSaveConstructionPlan();
+              }}
+            >
+              No
+            </button>
           </div>
         </div>
       )}
-      <button
-        onClick={handleOpenTextEditor}
-        disabled={disTextBut ? true : false}
-      >
-        Open Text Editor
+      {<div className="loader"></div>}
+      {isInfo && (
+        <div className="notification-modal">
+          <div className="notification-content">
+            <p>{notificationMessage}</p>
+            <button
+              onClick={() => {
+                setIsinfo(false);
+              }}
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
+      <button className="debug-button" onClick={handleDebugButtonClick}>
+        Debug
       </button>
     </div>
   );

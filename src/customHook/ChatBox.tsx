@@ -18,11 +18,7 @@ export default function ChatBox() {
     <>
       <div className="bg-white w-full rounded-lg shadow-lg p-4">
         <div className="mb-4">
-          <h1 className="text-3xl font-extrabold text-gray-800">Group Chat</h1>
-          <p className="text-gray-600">Welcome to the chat room!</p>
-          <p>
-            Online persons : <strong>fix me pls</strong>
-          </p>
+          <h1 className="text-3xl font-extrabold text-gray-800">Debug</h1>
         </div>
 
         <div className="overflow-y-auto max-h-96">
