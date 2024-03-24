@@ -16,7 +16,7 @@ function useWebSocket() {
 
   function connect(username: string) {
     try {
-      const socket: WebSocket = new SockJS(`http://localhost:8080/ws`);
+      const socket: WebSocket = new SockJS(`http://10.3.64.88:8080/ws`);
       const stompClient: Stomp.Client = Stomp.over(socket);
       stompClient.connect(
         {},
