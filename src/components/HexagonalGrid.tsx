@@ -3,7 +3,6 @@ import React, { useState, useEffect } from "react";
 import "./HexagonalGrid.css"; // Create a CSS file for styling if needed
 import { Player, ApiResponse } from "../model";
 import {
-  getCurrentPlayer,
   getPlayer,
   getCurLand,
   getLand,
@@ -20,10 +19,7 @@ import "./NotificationModal.css";
 import useWebSocket from "../customHook/useWebSocket.ts";
 import { useAppSelector } from "../customHook/store/hooks.ts";
 import { selectUsername } from "../customHook/store/Slices/usernameSlice.ts";
-import {
-  selectWebSocket,
-  messageType,
-} from "../customHook/store/Slices/webSocketSlice.ts";
+import { selectWebSocket } from "../customHook/store/Slices/webSocketSlice.ts";
 import ChatBox from "../customHook/ChatBox.tsx";
 
 function HexagonalGrid() {
@@ -38,7 +34,6 @@ function HexagonalGrid() {
   const [notificationMessage, setNotificationMessage] = useState("");
   const [showNotification, setShowNotification] = useState(false);
   const [isInfo, setIsinfo] = useState(false);
-  const { sendMessage } = useWebSocket();
   const username = useAppSelector(selectUsername);
   const webSocketState = useAppSelector(selectWebSocket);
   const [timeout, setTimeout] = useState(false);
@@ -48,7 +43,8 @@ function HexagonalGrid() {
   const [isLoading, setLoading] = useState(false);
   const [websocketMessage, setWebsocketMessage] = useState("");
   const [showChatBox, setShowChatBox] = useState(false);
-  const [showCountdown, setShowCountdown] = useState(false); // State to control visibility of countdown
+  const [showCountdown, setShowCountdown] = useState(false);
+  const [isFirsttime, setIsFirstTime] = useState(true);
 
   const navigate = useNavigate();
 
@@ -178,9 +174,15 @@ function HexagonalGrid() {
     try {
       await setConstructionPlan(username, constructionPlanText);
       await setCurConstructionPlan(username, constructionPlanText);
-      await Parse(username);
 
-      alert(username + " do parse");
+      if (!isFirsttime) {
+        await Parse(username);
+        alert(username + " do parse");
+      } else {
+        setIsFirstTime(false);
+        alert(username + " just arrive");
+      }
+
       setShowTextEditor(false);
       setDisbut(false);
       setLoading(false);
@@ -189,7 +191,6 @@ function HexagonalGrid() {
     } catch (error) {
       alert(error + " Please press save again.");
       setDisbut(false);
-      setLoading(false);
     }
   };
 
